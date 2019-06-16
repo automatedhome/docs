@@ -10,9 +10,9 @@ topics:
 - in: "unipi/climate/temperature/outside"
   out: "outside/temp"
 
-  #- in: "unipi/tank/temperature/up"
-  #  out: "solarControl/tank/temp_up"
-  #
+- in: "unipi/tank/temperature/up"
+  out: "solarControl/tank/temp_up"
+
   #- in: "unipi/solar/temperature/in"
   #  out: "solarControl/solar/temp_in"
   #- in: "unipi/solar/temperature/out"

@@ -9,6 +9,12 @@ services:
     volumes:
       - "${PWD}/mosquitto.conf:/mosquitto/config/mosquitto.conf"
       - mosquitto_data:/mosquitto/data
+  mqtt-logger:
+    image: eclipse-mosquitto:1.6
+    restart: unless-stopped
+    network_mode: host
+    entrypoint: "/usr/bin/mosquitto_sub"
+    command: [ "-h", "localhost", "-F", "%I: %t: %p", "-t", "#" ]
   bridge:
     image: automatedhome/evok-mqtt-bridge
     restart: unless-stopped
