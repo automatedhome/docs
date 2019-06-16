@@ -7,7 +7,7 @@ apps:
 
 .PHONY: mgmt
 mgmt: decrypt
-	source secrets && cd mgmt/ && docker-compose up -d
+	cd mgmt/ && docker-compose up -d
 
 .PHONY: encrypt
 encrypt: secrets.enc
