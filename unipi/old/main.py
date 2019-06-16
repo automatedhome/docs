@@ -173,7 +173,7 @@ class Controller():
                 break
             if i == (EVOK_API_RETRIES - 1):
                 self.log.critical("Solar circuit flow couldn't be set. No comm to EVOK after {} retries".format(EVOK_API_RETRIES))
-                return
+                return            self.mqtt_publish("actuators/" + relay, relval)
         if no_flow:
             value = 0
         if self.flow != value:
@@ -194,7 +194,7 @@ class Controller():
         value = ""
         for relay in order:
             relval = str(int(self.relays[relay]))
-            self.mqtt_publish("actuators/" + relay, relval)
+            publish.single(MQTT_PREFIX + "/actuators/" + relay, relval, hostname=MQTT_BROKER)
             value += relval
         v = int(value, 2)
         if self.actuators_value != v:
@@ -302,7 +302,7 @@ class Controller():
             self.set_setting(topic, msg.payload)
 
     def set_temp(self, sensor, value):
-        if self.temperatures[sensor] == value:
+        if value - 0.05 < self.temperatures[sensor] < value + 0.05:
             return
         self.temperatures[sensor] = value
         self.log.info("{} temperature set to {} from external source".format(sensor, value))
