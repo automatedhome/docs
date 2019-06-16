@@ -1,0 +1,29 @@
+# REMOVE AFTER MIGRATION TO HA
+topics:
+- in: "unipi/circulation/detect"
+  out: "solarControl/circulate/pump"
+
+- in: "unipi/climate/temperature/inside"
+  out: "room/1/temp_real"
+- in: "room/1/temp_real"
+  out: "room/1/temp_current"
+- in: "unipi/climate/temperature/outside"
+  out: "outside/temp"
+
+  #- in: "unipi/tank/temperature/up"
+  #  out: "solarControl/tank/temp_up"
+  #
+  #- in: "unipi/solar/temperature/in"
+  #  out: "solarControl/solar/temp_in"
+  #- in: "unipi/solar/temperature/out"
+  #  out: "solarControl/solar/temp_out"
+  #- in: "unipi/solar/temperature/up"
+  #  out: "solarControl/solar/temp"
+  #
+  #- in: "unipi/heater/temperature/in"
+  #  out: "solarControl/heater/temp_in"
+  #- in: "unipi/heater/temperature/out"
+  #  out: "solarControl/heater/temp_out"
+  #
+  #- in: "unipi/solar/actuators/flow"
+  #  out: "solarControl/solar/pump"

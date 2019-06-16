@@ -1,0 +1,126 @@
+---
+version: '2'
+services:
+  # BASIC SERVICES
+  mosquitto:
+    image: eclipse-mosquitto:1.6
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - "${PWD}/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+      - mosquitto_data:/mosquitto/data
+  bridge:
+    image: automatedhome/evok-mqtt-bridge
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - mosquitto
+  evokmapper:
+    image: automatedhome/mqttmapper
+    restart: unless-stopped
+    network_mode: host
+    depends_on: 
+      - mosquitto 
+      - bridge
+    volumes:
+      - "${PWD}/evokmapping.yml:/config.yaml"
+    command: [ "-clientid", "evokmapper" ]
+
+  # Periodic synchroniser, should be removed when system gets stable
+  synchroniser:
+    image: automatedhome/evok-synchroniser
+    restart: unless-stopped
+    network_mode: host
+    depends_on: 
+      - mosquitto 
+      - bridge
+
+  # SENSORS
+  flow-meter:
+    image: automatedhome/flow-meter
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - synchroniser
+      - mosquitto
+    command: ["-outTopic", "solar/flow/value"]
+  analog-in:
+    image: automatedhome/analog-temperature
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - synchroniser
+      - mosquitto
+  roomtemp:
+    image: automatedhome/roomtemp
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      - synchroniser
+      - mosquitto
+
+  # CONTROLLERS
+  #scheduler:
+  #  image: automatedhome/scheduler
+  #  restart: unless-stopped
+  #  network_mode: host
+  #  depends_on: 
+  #    - bridge
+  #    - mosquitto
+  #solar:
+  #  image: automatedhome/solar
+  #  restart: unless-stopped
+  #  network_mode: host
+  #  depends_on: 
+  #    - mosquitto 
+  #    - bridge
+  #    - evokmapper
+  #heater:
+  #  image: automatedhome/heater
+  #  restart: unless-stopped
+  #  network_mode: host
+  #  depends_on: 
+  #    - mosquitto 
+  #    - bridge
+  #    - evokmapper
+  circulation:
+    image: automatedhome/circulation
+    restart: unless-stopped
+    network_mode: host
+    depends_on: 
+      - mosquitto 
+      - bridge
+      - evokmapper
+
+  # MIGRATION
+  schedulemapper:
+    image: automatedhome/schedulemapper
+    restart: unless-stopped
+    network_mode: host
+    depends_on: 
+      - mosquitto 
+      - bridge
+  settingsmapper:
+    image: automatedhome/mqttmapper
+    restart: unless-stopped
+    network_mode: host
+    depends_on: 
+      - mosquitto 
+      - bridge
+    volumes:
+      - "${PWD}/settingsmapping.yml:/config.yaml"
+    command: [ "-clientid", "settingsmapper", "-broker", "tcp://192.168.20.3:1883" ]
+  devmapper:
+    image: automatedhome/mqttmapper
+    restart: unless-stopped
+    network_mode: host
+    depends_on: 
+      - mosquitto 
+      - bridge
+      - evokmapper
+    volumes:
+      - "${PWD}/devmapping.yml:/config.yaml"
+    command: [ "-clientid", "devnmapper", "-broker", "tcp://192.168.20.3:1883" ]
+
+volumes:
+  mosquitto_data:
