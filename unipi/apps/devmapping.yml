@@ -1,5 +1,6 @@
 # REMOVE AFTER MIGRATION TO HA
 topics:
+# SENSORS
 - in: "unipi/circulation/detect"
   out: "solarControl/circulate/pump"
 
@@ -24,6 +25,21 @@ topics:
   out: "solarControl/heater/temp_in"
 - in: "unipi/heater/temperature/out"
   out: "solarControl/heater/temp_out"
-  #
+
+# FLOW %
   #- in: "unipi/solar/actuators/flow"
   #  out: "solarControl/solar/pump"
+
+# ACTUATORS
+- in: "unipi/circulation/pump"
+  out: "solarControl/actuators/circulation"
+
+- in: "unipi/heater/actuators/burner"
+  out: "solarControl/actuators/heater"
+- in: "unipi/heater/actuators/switch"
+  out: "solarControl/actuators/co_cwu"
+
+- in: "unipi/solar/actuators/pump"
+  out: "solarControl/actuators/pump"
+- in: "unipi/solar/actuators/switch"
+  out: "solarControl/actuators/solar"
