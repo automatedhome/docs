@@ -13,17 +13,17 @@ topics:
 - in: "unipi/tank/temperature/up"
   out: "solarControl/tank/temp_up"
 
-  #- in: "unipi/solar/temperature/in"
-  #  out: "solarControl/solar/temp_in"
-  #- in: "unipi/solar/temperature/out"
-  #  out: "solarControl/solar/temp_out"
-  #- in: "unipi/solar/temperature/up"
-  #  out: "solarControl/solar/temp"
-  #
-  #- in: "unipi/heater/temperature/in"
-  #  out: "solarControl/heater/temp_in"
-  #- in: "unipi/heater/temperature/out"
-  #  out: "solarControl/heater/temp_out"
+- in: "unipi/solar/temperature/in"
+  out: "solarControl/solar/temp_in"
+- in: "unipi/solar/temperature/out"
+  out: "solarControl/solar/temp_out"
+- in: "unipi/solar/temperature/up"
+  out: "solarControl/solar/temp"
+
+- in: "unipi/heater/temperature/in"
+  out: "solarControl/heater/temp_in"
+- in: "unipi/heater/temperature/out"
+  out: "solarControl/heater/temp_out"
   #
   #- in: "unipi/solar/actuators/flow"
   #  out: "solarControl/solar/pump"
