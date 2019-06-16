@@ -307,8 +307,8 @@ class Controller():
 
     def wait_for_data(self):
         while True:
-            if any(300 == value for key, value in d.items()):
-                 self.log.warning("Waiting 10s for sensors data")
+            if any(300 == value for key, value in self.temperatures.items()):
+                self.log.warning("Waiting 10s for sensors data")
                 time.sleep(10)
             else:
                 break
@@ -464,8 +464,8 @@ class Controller():
         while True:
             try:
                 self.run_once()
-            except ConnectionError:
-                self.log.error("Problems with connecting to EVOK. Retrying in {}".format(interval))
+            #except ConnectionError:
+            #    self.log.error("Problems with connecting to EVOK. Retrying in {}".format(interval))
             except Exception as e:
                 self.log.exception(e)
             finally:
