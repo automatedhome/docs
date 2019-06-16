@@ -30,7 +30,7 @@ ADDR_RELAY_CIRC = "4"
 #ADDR_TEMP_SOLAR_IN = "28FF0A9171150270"
 #ADDR_TEMP_SOLAR_OUT = "28FF1A181515019F"
 #ADDR_TEMP_TANK_UP = "28FF4C30041503A7"
-ADDR_TEMP_INSIDE = "28FF89DB06000034"
+#ADDR_TEMP_INSIDE = "28FF89DB06000034"
 #ADDR_TEMP_OUTSIDE = "287CECBF060000DA"
 # ADDR_TEMP_OUTSIDE = "28BECABF0600004F"
 
@@ -42,9 +42,6 @@ USE_THERMISTOR = False
 
 
 class Controller():
-    temp_sensor_addr_map = {
-        "inside":     ADDR_TEMP_INSIDE
-    }
     relays_addr_map = {
         "co_cwu":      ADDR_RELAY_CO_CWU,  # CWU == TRUE
         "solar":       ADDR_RELAY_SOL,
@@ -56,7 +53,6 @@ class Controller():
         "actuators":   MQTT_PREFIX + "/actuators",
         "circulation": MQTT_PREFIX + "/circulate/pump",
         "solar_pump":  MQTT_PREFIX + "/solar/pump",
-        "inside":      "room/1/temp_current"
     }
     thermistor = USE_THERMISTOR
 
@@ -103,45 +99,16 @@ class Controller():
         }
         self.manual = False
         self.relays = dict().fromkeys(self.relays_addr_map, True)
-        self.temperatures = dict().fromkeys(self.temp_sensor_addr_map, -99)
         self.temperatures['tank_up'] = 300
         self.temperatures['solar_up'] = 300
         self.temperatures['solar_in'] = 300
         self.temperatures['solar_out'] = 300
         self.temperatures['heater_in'] = 300
         self.temperatures['heater_out'] = 300
+        self.temperatures['inside'] = 300
         for relay in self.relays:
             self.set_relay(relay, False)
         self.log.debug("Controller initiated")
-
-    def update_sensors(self):
-        for key, _ in self.temp_sensor_addr_map.items():
-            self.update_temperature(key)
-
-    def update_temperature(self, sensor):
-        if sensor == "inside" and self.external_room_temperature_source:
-            return
-        else:
-            addr = self.temp_sensor_addr_map[sensor]
-            r = requests.get(EVOK_API + "/json/sensor/" + addr)
-            try:
-                value = float(r.json()['data']['value'])
-            except KeyError:
-                value = 199
-                if r.status_code >= 500:
-                    self.log.critical("Temperature sensor for {} ({}) is unavailable".format(sensor, addr))
-            if DEBUG:
-                new = raw_input("Provide value for sensor '{}' or ENTER to ack value of '{}' ".format(sensor, value))
-                if new != "":
-                    value = float(new)
-        try:
-            old = self.temperatures[sensor]
-        except KeyError:
-            old = None
-        if old != value:
-            self.temperatures[sensor] = value
-            self.mqtt_publish(sensor, value)
-            self.log.debug("Updated temperature from sensor {} to {} deg".format(sensor, value))
 
     def normalize_thermistor(self, voltage):
         B = 3950  # Thermistor coefficient (in Kelvin)
@@ -315,11 +282,7 @@ class Controller():
     def mqtt_on_message(self, client, userdata, msg):
         topic = str(msg.topic)
         self.log.debug("Got new mqtt message on topic '{}' with value of '{}'".format(topic, msg.payload))
-        if topic == "room/1/temp_real":
-            if self.external_room_temperature_source:
-                self.log.info("Room temperature set to {} from external source".format(float(msg.payload)))
-                self.temperatures['inside'] = float(msg.payload)
-        elif topic == "solarControl/tank/temp_up":
+        if topic == "solarControl/tank/temp_up":
             self.set_temp("tank_up", float(msg.payload))
         elif topic == "solarControl/solar/temp":
             self.set_temp("solar_up", float(msg.payload))
@@ -331,6 +294,8 @@ class Controller():
             self.set_temp("heater_in", float(msg.payload))
         elif topic == "solarControl/heater/temp_out":
             self.set_temp("heater_out", float(msg.payload))
+        elif topic == "room/1/temp_current":
+            self.set_temp("inside", float(msg.payload))
         else:
             self.set_setting(topic, msg.payload)
 
@@ -339,6 +304,14 @@ class Controller():
             return
         self.temperatures[sensor] = value
         self.log.info("{} temperature set to {} from external source".format(sensor, value))
+
+    def wait_for_data(self):
+        while True:
+            if any(300 == value for key, value in d.items()):
+                 self.log.warning("Waiting 10s for sensors data")
+                time.sleep(10)
+            else:
+                break
 
     # PROGRAM #
     def calculate_flow(self):
@@ -479,7 +452,7 @@ class Controller():
                 self.settings['heater']['expected'] = 21
             else:
                 self.external_room_temperature_source = True
-            self.update_sensors()
+            self.wait_for_data()
             #self.run_circulation()
             self.run_solar()
             self.run_heater()
