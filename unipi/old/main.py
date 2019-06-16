@@ -311,7 +311,6 @@ class Controller():
                 self.log.warning("Waiting 10s for sensors data.")
                 time.sleep(10)
             else:
-                self.log.info("All sensors data present. Starting control loop.")
                 break
 
     # PROGRAM #
