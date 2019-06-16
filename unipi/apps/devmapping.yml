@@ -4,9 +4,9 @@ topics:
   out: "solarControl/circulate/pump"
 
 - in: "unipi/climate/temperature/inside"
-  out: "room/1/temp_real"
-- in: "room/1/temp_real"
   out: "room/1/temp_current"
+- in: "room/1/temp_current"
+  out: "room/1/temp_real"
 - in: "unipi/climate/temperature/outside"
   out: "outside/temp"
 

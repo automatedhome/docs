@@ -308,9 +308,10 @@ class Controller():
     def wait_for_data(self):
         while True:
             if any(300 == value for key, value in self.temperatures.items()):
-                self.log.warning("Waiting 10s for sensors data")
+                self.log.warning("Waiting 10s for sensors data.")
                 time.sleep(10)
             else:
+                self.log.info("All sensors data present. Starting control loop.")
                 break
 
     # PROGRAM #
