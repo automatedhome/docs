@@ -194,13 +194,18 @@ class Controller():
         value = ""
         for relay in order:
             relval = str(int(self.relays[relay]))
-            publish.single(MQTT_PREFIX + "/actuators/" + relay, relval, hostname=MQTT_BROKER)
+            self.act_pub(relay, relval)
             value += relval
         v = int(value, 2)
         if self.actuators_value != v:
             self.log.debug("Relays are set to following states: {}".format(self.relays))
             self.actuators_value = v
             self.mqtt_publish("actuators", v)
+
+    def act_pub(self, act, value):
+        if act == "circulation":
+            return
+        publish.single(MQTT_PREFIX + "/actuators/" + act, value, hostname=MQTT_BROKER)
 
     # Settings parser #
     def set_setting(self, mqtt_topic, payload):
