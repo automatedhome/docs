@@ -193,7 +193,9 @@ class Controller():
         order = ["circulation", "heater", "co_cwu", "pump", "solar"]
         value = ""
         for relay in order:
-            value += str(int(self.relays[relay]))
+            relval = str(int(self.relays[relay]))
+            self.mqtt_publish("actuators/" + relay, relval)
+            value += relval
         v = int(value, 2)
         if self.actuators_value != v:
             self.log.debug("Relays are set to following states: {}".format(self.relays))
