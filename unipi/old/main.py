@@ -267,7 +267,7 @@ class Controller():
 
     def mqtt_on_connect(self, client, userdata, flags, rc):
         client.subscribe("solarControl/+/settings/#")
-        client.subscribe("room/1/temp_real")
+        client.subscribe("room/1/temp_current")
         # Use tank temperature published by external system
         client.subscribe("solarControl/tank/temp_up")
         # Use solar temperatures published by external system
@@ -309,7 +309,6 @@ class Controller():
         while True:
             if any(300 == value for key, value in self.temperatures.items()):
                 self.log.warning("Waiting 10s for sensors data.")
-                self.log.warning(self.temperatures)
                 time.sleep(10)
             else:
                 self.log.info("All sensors data present. Starting control loop.")
