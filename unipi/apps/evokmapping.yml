@@ -14,6 +14,7 @@ topics:
 - in: "evok/temp/28FF89DB06000034/value"
   out: "climate/temperature/inside"
 
+# Following are set in each application
   #- in: "solar/actuators/flow"
   #  out: "evok/ao/1/set"
   #- in: "solar/actuators/pump"
@@ -24,8 +25,8 @@ topics:
   #  out: "evok/relay/5/set"
   #- in: "heater/actuators/switch"
   #  out: "evok/relay/1/set"
-- in: "circulation/pump"
-  out: "evok/relay/4/set"
-
-- in: "evok/input/5/value"
-  out: "circulation/detect"
+  #- in: "circulation/pump"
+  #  out: "evok/relay/4/set"
+  #
+  #- in: "evok/input/5/value"
+  #  out: "circulation/detect"
