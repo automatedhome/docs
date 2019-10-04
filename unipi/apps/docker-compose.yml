@@ -24,17 +24,6 @@ services:
     network_mode: host
     depends_on:
       - mosquitto
-  evokmapper:
-    image: automatedhome/mqttmapper
-    restart: unless-stopped
-    network_mode: host
-    depends_on: 
-      - mosquitto 
-      - bridge
-    volumes:
-      - "${PWD}/evokmapping.yml:/config.yaml"
-      - /etc/localtime:/etc/localtime:ro
-    command: [ "-clientid", "evokmapper" ]
 
   # Periodic synchroniser, should be removed when system gets stable
   synchroniser:
@@ -44,6 +33,7 @@ services:
     depends_on: 
       - mosquitto 
       - bridge
+    command: [ "-interval", "5" ]
 
   # SENSORS
   flow-meter:
@@ -51,7 +41,6 @@ services:
     restart: unless-stopped
     network_mode: host
     depends_on:
-      - synchroniser
       - mosquitto
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -61,7 +50,6 @@ services:
     restart: unless-stopped
     network_mode: host
     depends_on:
-      - synchroniser
       - mosquitto
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -70,7 +58,6 @@ services:
     restart: unless-stopped
     network_mode: host
     depends_on:
-      - synchroniser
       - mosquitto
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -91,7 +78,6 @@ services:
     depends_on: 
       - mosquitto 
       - bridge
-      - evokmapper
   heater:
     image: automatedhome/heater
     restart: unless-stopped
@@ -99,7 +85,6 @@ services:
     depends_on: 
       - mosquitto 
       - bridge
-      - evokmapper
   circulation:
     image: automatedhome/circulation
     restart: unless-stopped
@@ -107,7 +92,6 @@ services:
     depends_on: 
       - mosquitto 
       - bridge
-      - evokmapper
     command: ["-inTopic", "evok/input/5/value", "-outTopic", "evok/relay/4/set"]
     volumes:
       - /etc/localtime:/etc/localtime:ro
